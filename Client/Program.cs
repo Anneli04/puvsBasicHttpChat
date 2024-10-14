@@ -61,6 +61,7 @@ public class Program
     /// <param name="e">The <see cref="MessageReceivedEventArgs"/> instance containing the event data.</param>
     static void MessageReceivedHandler(object? sender, MessageReceivedEventArgs e)
     {
-        Console.WriteLine($"\nReceived new message from {e.Sender}: {e.Message}");
+        var formattedTime = DateTime.Now.ToString("HH:mm:ss");
+        Console.WriteLine($"\n{formattedTime} Received new message from {e.Sender}: {e.Message}");
     }
 }
