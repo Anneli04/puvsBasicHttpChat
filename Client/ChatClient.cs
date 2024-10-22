@@ -56,8 +56,8 @@ public class ChatClient
     /// <returns>True if the message could be send; otherwise False</returns>
     public async Task<bool> SendMessage(string content)
     {
-        // Wende die Filterung auf die Nachricht an
-        string filteredMessage = MessageFilter.FilterMessage(content);
+        // Wende die Filterung auf die Nachricht an, sende den Alias als Sender
+        string filteredMessage = MessageFilter.FilterMessage(this.alias, content);
 
         // Überprüfe, ob die gefilterte Nachricht leer ist oder nur "***" enthält
         if (string.IsNullOrWhiteSpace(filteredMessage) || filteredMessage == "***")
@@ -71,6 +71,7 @@ public class ChatClient
 
         return response.IsSuccessStatusCode;
     }
+
 
     /// <summary>
     /// Listens for messages until this process is cancelled by the user.

@@ -67,7 +67,7 @@ public class ChatServer
                 }
 
                 // Filter the message content
-                message.Content = MessageFilter.FilterMessage(message.Content);
+                message.Content = MessageFilter.FilterMessage(message.Sender, message.Content); // Sender hinzufügen
                 Console.WriteLine($"Received message from client: {message!.Content}");
 
                 this.messageQueue.Enqueue(message);
