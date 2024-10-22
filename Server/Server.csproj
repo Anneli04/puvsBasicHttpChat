@@ -8,8 +8,19 @@
   </PropertyGroup>
 
   <ItemGroup>
-	  <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="7.0.5" />
-	  <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
+    <None Remove="filterConfig.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="filterConfig.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+	  <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.10" />
+	  <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+	  <PackageReference Include="Swashbuckle.AspNetCore" Version="6.9.0" />
   </ItemGroup>
 
   <ItemGroup>

@@ -1,5 +1,6 @@
 ﻿using System.Net.Http.Json;
 using Data;
+using Server;
 
 namespace Client;
 
@@ -55,12 +56,22 @@ public class ChatClient
     /// <returns>True if the message could be send; otherwise False</returns>
     public async Task<bool> SendMessage(string content)
     {
-        // creates the message and sends it to the server
-        var message = new ChatMessage { Sender = this.alias, Content = content };
+        // Wende die Filterung auf die Nachricht an. Sender wird als Alias gesendet.
+        string filteredMessage = MessageFilter.FilterMessage(this.alias, content);
+
+        // Überprüfet, ob die gefilterte Nachricht leer ist.
+        if (string.IsNullOrWhiteSpace(filteredMessage))
+        {
+            return false; // Nachricht kann nicht gesendet werden.
+        }
+
+        // Erstellt die Nachricht und sendet sie an den Server.
+        var message = new ChatMessage { Sender = this.alias, Content = filteredMessage };
         var response = await this.httpClient.PostAsJsonAsync("/messages", message);
 
         return response.IsSuccessStatusCode;
     }
+
 
     /// <summary>
     /// Listens for messages until this process is cancelled by the user.
