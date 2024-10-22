@@ -32,20 +32,26 @@ namespace Server
             foreach (var word in _schimpfwoerter)
             {
                 string pattern = $@"\b{Regex.Escape(word)}\b";
-                message = Regex.Replace(message, pattern, "***", RegexOptions.IgnoreCase);
+                // Erstelle die Anzahl der '*' entsprechend der Länge des Wortes
+                string replacement = new string('*', word.Length);
+                message = Regex.Replace(message, pattern, replacement, RegexOptions.IgnoreCase);
             }
 
             // Filtere unangebrachte Wörter
             foreach (var word in _unangebrachteWoerter)
             {
                 string pattern = $@"\b{Regex.Escape(word)}\b";
-                message = Regex.Replace(message, pattern, "***", RegexOptions.IgnoreCase);
+                // Erstelle die Anzahl der '*' entsprechend der Länge des Wortes
+                string replacement = new string('*', word.Length);
+                message = Regex.Replace(message, pattern, replacement, RegexOptions.IgnoreCase);
             }
 
             // Filtere Abkürzungen
             foreach (var abk in _abkuerzungen)
             {
-                message = message.Replace(abk, "***"); // Evtl. ohne Regex, da es keine Wortgrenze braucht
+                // Erstelle die Anzahl der '*' entsprechend der Länge der Abkürzung
+                string replacement = new string('*', abk.Length);
+                message = message.Replace(abk, replacement); // Evtl. ohne Regex, da es keine Wortgrenze braucht
             }
 
             return message;
