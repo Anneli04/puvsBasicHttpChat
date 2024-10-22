@@ -56,16 +56,16 @@ public class ChatClient
     /// <returns>True if the message could be send; otherwise False</returns>
     public async Task<bool> SendMessage(string content)
     {
-        // Wende die Filterung auf die Nachricht an, sende den Alias als Sender
+        // Wende die Filterung auf die Nachricht an. Sender wird als Alias gesendet.
         string filteredMessage = MessageFilter.FilterMessage(this.alias, content);
 
-        // Überprüfe, ob die gefilterte Nachricht leer ist oder nur "***" enthält
+        // Überprüfet, ob die gefilterte Nachricht leer ist oder nur Sterne enthält.
         if (string.IsNullOrWhiteSpace(filteredMessage) || filteredMessage == "***")
         {
-            return false; // Nachricht kann nicht gesendet werden
+            return false; // Nachricht kann nicht gesendet werden.
         }
 
-        // Erstelle die Nachricht und sende sie an den Server
+        // Erstellt die Nachricht und sendet sie an den Server.
         var message = new ChatMessage { Sender = this.alias, Content = filteredMessage };
         var response = await this.httpClient.PostAsJsonAsync("/messages", message);
 
