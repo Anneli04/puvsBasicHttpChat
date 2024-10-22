@@ -67,8 +67,8 @@ namespace Server
         private static string FilterUnwantedContent(string message)
         {
             // Filterung des unangemessenen Inhalts
-            message = ReplaceWords(message, _schimpfwoerter);
-            message = ReplaceWords(message, _unangebrachteWoerter);
+            message = ReplaceWords(message, _schimpfwoerter, true);
+            message = ReplaceWords(message, _unangebrachteWoerter, true);
             message = ReplaceWords(message, _abkuerzungen, true);
 
             return message; // Gibt die bearbeitete Nachricht zurück
@@ -81,7 +81,7 @@ namespace Server
         {
             foreach (var word in words)
             {
-                string pattern = $@"\b{Regex.Escape(word)}\b"; // RegEx-Muster für das Wort
+                string pattern = $@"(?i)\b{Regex.Escape(word)}\b"; // RegEx-Muster für das Wort
                 string replacement = new string('*', word.Length); // Ersetzt das Wort durch Sterne
                 message = Regex.Replace(message, pattern, replacement, caseInsensitive ? RegexOptions.IgnoreCase : RegexOptions.None);// Bei der Umwandlung in Sterne spielt die Groß- und Kleinschreibung keine Rolle.
             }
