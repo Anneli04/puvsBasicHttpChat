@@ -10,7 +10,13 @@ namespace Server
         private readonly ConcurrentQueue<ChatMessage> messageQueue = new();
         private readonly ConcurrentDictionary<string, TaskCompletionSource<ChatMessage>> waitingClients = new();
         private readonly object lockObject = new();
-        private readonly List<ChatMessage> chatHistory = new(); // Liste für den Chatverlauf
+        private readonly DatabaseManager databaseManager; // Instanz von DatabaseManager
+
+        public ChatServer()
+        {
+            databaseManager = new DatabaseManager(); // Initialisiere die Datenbankmanager-Instanz
+            databaseManager.InitializeDatabase(); // Stelle sicher, dass die Datenbank und die Tabelle erstellt werden
+        }
 
         public void Configure(IApplicationBuilder app)
         {
@@ -73,7 +79,8 @@ namespace Server
 
                     message.Timestamp = DateTime.Now;
 
-                    chatHistory.Add(message); // Füge die Nachricht zum Verlauf hinzu
+                    // Speichere die Nachricht in der Datenbank
+                    databaseManager.SaveMessage(message);
 
                     this.messageQueue.Enqueue(message);
 
@@ -94,6 +101,8 @@ namespace Server
                 // Endpunkt zum Abrufen des Chatverlaufs
                 endpoints.MapGet("/history", async context =>
                 {
+                    // Lade den Chatverlauf aus der Datenbank
+                    var chatHistory = databaseManager.GetAllMessages();
                     context.Response.ContentType = "application/json";
                     await context.Response.WriteAsJsonAsync(chatHistory);
                 });
