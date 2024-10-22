@@ -59,7 +59,7 @@ public class ChatClient
         // Wende die Filterung auf die Nachricht an. Sender wird als Alias gesendet.
         string filteredMessage = MessageFilter.FilterMessage(this.alias, content);
 
-        // Überprüfet, ob die gefilterte Nachricht leer ist.
+        // Überprüft, ob die gefilterte Nachricht leer ist.
         if (string.IsNullOrWhiteSpace(filteredMessage))
         {
             return false; // Nachricht kann nicht gesendet werden.
@@ -71,7 +71,6 @@ public class ChatClient
 
         return response.IsSuccessStatusCode;
     }
-
 
     /// <summary>
     /// Listens for messages until this process is cancelled by the user.
@@ -97,7 +96,6 @@ public class ChatClient
             catch (TaskCanceledException) when (cancellationToken.IsCancellationRequested)
             {
                 // catch the cancellation 
-                this.OnMessageReceived("Me", "Leaving the chat");
                 break;
             }
         }
@@ -106,10 +104,32 @@ public class ChatClient
     /// <summary>
     /// Cancels the loop for listening for messages.
     /// </summary>
-    public void CancelListeningForMessages()
+    public async Task CancelListeningForMessages()
     {
-        // signal the cancellation request
-        this.cancellationTokenSource.Cancel(); 
+        // Sendet eine Abmeldungsnachricht an den Server.
+        var message = new ChatMessage { Sender = this.alias, Content = $"left the chat" };
+        await this.httpClient.PostAsJsonAsync("/messages", message);
+
+        // Signalisiert die Abbruchanforderung.
+        this.cancellationTokenSource.Cancel();
+    }
+
+
+    /// <summary>
+    /// Retrieves the chat history from the server.
+    /// </summary>
+    /// <returns>A list of chat messages.</returns>
+    public async Task<List<ChatMessage>> GetChatHistory()
+    {
+        var response = await this.httpClient.GetAsync("/history");
+
+        // Wenn die Anfrage erfolgreich ist, wird die Liste mit den Nachrichten zurückgegeben.
+        if (response.IsSuccessStatusCode)
+        {
+            return await response.Content.ReadFromJsonAsync<List<ChatMessage>>();
+        }
+
+        return new List<ChatMessage>(); // Gibt bei einem Fehler eine leere Liste zurück-
     }
 
     // Enabled the user to receive new messages. The assigned delegated is called when a new message is received.
@@ -124,4 +144,19 @@ public class ChatClient
     {
         this.MessageReceived?.Invoke(this, new MessageReceivedEventArgs { Sender = sender, Message = message });
     }
+
+    /// <summary>
+    /// Zeigt die Chathistorie in der Konsole an.
+    /// </summary>
+    public async Task ShowChatHistory()
+    {
+        var history = await GetChatHistory();
+        Console.WriteLine("Chat History:");
+        // Durchläuft die Chat-Historie und gibt jede Nachricht mit einem Zeitstempel zurück.
+        foreach (var message in history)
+        {
+            Console.WriteLine($"{message.Timestamp:HH:mm:ss} {message.Sender}: {message.Content}");
+        }
+    }
+
 }
