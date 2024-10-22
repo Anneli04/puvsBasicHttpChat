@@ -59,8 +59,8 @@ public class ChatClient
         // Wende die Filterung auf die Nachricht an. Sender wird als Alias gesendet.
         string filteredMessage = MessageFilter.FilterMessage(this.alias, content);
 
-        // Überprüfet, ob die gefilterte Nachricht leer ist oder nur Sterne enthält.
-        if (string.IsNullOrWhiteSpace(filteredMessage) || filteredMessage == "***")
+        // Überprüfet, ob die gefilterte Nachricht leer ist.
+        if (string.IsNullOrWhiteSpace(filteredMessage))
         {
             return false; // Nachricht kann nicht gesendet werden.
         }
