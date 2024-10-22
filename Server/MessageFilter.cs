@@ -32,7 +32,6 @@ namespace Server
             foreach (var word in _schimpfwoerter)
             {
                 string pattern = $@"\b{Regex.Escape(word)}\b";
-                // Erstelle die Anzahl der '*' entsprechend der Länge des Wortes
                 string replacement = new string('*', word.Length);
                 message = Regex.Replace(message, pattern, replacement, RegexOptions.IgnoreCase);
             }
@@ -41,17 +40,16 @@ namespace Server
             foreach (var word in _unangebrachteWoerter)
             {
                 string pattern = $@"\b{Regex.Escape(word)}\b";
-                // Erstelle die Anzahl der '*' entsprechend der Länge des Wortes
                 string replacement = new string('*', word.Length);
                 message = Regex.Replace(message, pattern, replacement, RegexOptions.IgnoreCase);
             }
 
-            // Filtere Abkürzungen
+            // Filtere Abkürzungen (case-insensitive)
             foreach (var abk in _abkuerzungen)
             {
-                // Erstelle die Anzahl der '*' entsprechend der Länge der Abkürzung
+                string pattern = Regex.Escape(abk);
                 string replacement = new string('*', abk.Length);
-                message = message.Replace(abk, replacement); // Evtl. ohne Regex, da es keine Wortgrenze braucht
+                message = Regex.Replace(message, pattern, replacement, RegexOptions.IgnoreCase);
             }
 
             return message;
