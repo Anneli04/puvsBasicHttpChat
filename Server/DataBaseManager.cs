@@ -4,10 +4,16 @@ using Data;
 
 namespace Server
 {
+    /// <summary>
+    /// Verwaltet die Interaktion mit der SQLite-Datenbank für Chatnachrichten.
+    /// </summary>
     public class DatabaseManager
     {
         private const string ConnectionString = "Data Source=chat.db"; // Pfad zur SQLite-Datenbankdatei
 
+        /// <summary>
+        /// Datenbank wird initialisiert, indem, falls nicht vorhanden, die Tabelle ChatMessages erstellt wird.
+        /// </summary>
         public void InitializeDatabase()
         {
             using var connection = new SqliteConnection(ConnectionString);
@@ -26,6 +32,9 @@ namespace Server
             command.ExecuteNonQuery();
         }
 
+        /// <summary>
+        /// Speichert eine Chatnachricht in der Datenbank.
+        /// </summary>
         public void SaveMessage(ChatMessage message)
         {
             using var connection = new SqliteConnection(ConnectionString);
@@ -42,6 +51,9 @@ namespace Server
             command.ExecuteNonQuery();
         }
 
+        /// <summary>
+        /// Ruft alle Chatnachrichten aus der Datenbank ab.
+        /// </summary>
         public List<ChatMessage> GetAllMessages()
         {
             var messages = new List<ChatMessage>();
@@ -63,7 +75,7 @@ namespace Server
                 });
             }
 
-            return messages;
+            return messages; // Gibt die Liste der Chatnachrichten zurück.
         }
     }
 }

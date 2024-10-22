@@ -21,8 +21,8 @@ public class Program
         // connect to the server and start listening for messages
         var connectTask = await client.Connect();
 
-        // Zeige den Chat-Verlauf an
-        await client.ShowChatHistory(); // Hier den Verlauf anzeigen
+        // Zeigt die Chathistorie an:
+        await client.ShowChatHistory();
 
         var listenTask = client.ListenForMessages();
 

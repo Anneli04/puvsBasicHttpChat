@@ -10,12 +10,12 @@ namespace Server
         private readonly ConcurrentQueue<ChatMessage> messageQueue = new();
         private readonly ConcurrentDictionary<string, TaskCompletionSource<ChatMessage>> waitingClients = new();
         private readonly object lockObject = new();
-        private readonly DatabaseManager databaseManager; // Instanz von DatabaseManager
+        private readonly DatabaseManager databaseManager; 
 
         public ChatServer()
         {
-            databaseManager = new DatabaseManager(); // Initialisiere die Datenbankmanager-Instanz
-            databaseManager.InitializeDatabase(); // Stelle sicher, dass die Datenbank und die Tabelle erstellt werden
+            databaseManager = new DatabaseManager(); // Die Instanz vom DataBaseManager wird initialisiert.
+            databaseManager.InitializeDatabase(); // Stellt sicher, dass die Datenbank und die Tabelle erstellt werden.
         }
 
         public void Configure(IApplicationBuilder app)
@@ -32,7 +32,7 @@ namespace Server
 
                     Console.WriteLine($"Client '{id}' registered");
 
-                    // Registriere den Client
+                    // Der Client wird registriert.
                     var error = true;
                     lock (this.lockObject)
                     {
@@ -79,7 +79,7 @@ namespace Server
 
                     message.Timestamp = DateTime.Now;
 
-                    // Speichere die Nachricht in der Datenbank
+                    // Speichert die Nachricht in der Datenbank
                     databaseManager.SaveMessage(message);
 
                     this.messageQueue.Enqueue(message);
@@ -98,10 +98,10 @@ namespace Server
                     await context.Response.WriteAsync("Message received and processed.");
                 });
 
-                // Endpunkt zum Abrufen des Chatverlaufs
+                // Endpunkt zum Abrufen des Chatverlaufs.
                 endpoints.MapGet("/history", async context =>
                 {
-                    // Lade den Chatverlauf aus der Datenbank
+                    // Chathistorie wird aus Datenbank geladen.
                     var chatHistory = databaseManager.GetAllMessages();
                     context.Response.ContentType = "application/json";
                     await context.Response.WriteAsJsonAsync(chatHistory);

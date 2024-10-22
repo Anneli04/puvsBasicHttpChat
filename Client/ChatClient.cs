@@ -59,7 +59,7 @@ public class ChatClient
         // Wende die Filterung auf die Nachricht an. Sender wird als Alias gesendet.
         string filteredMessage = MessageFilter.FilterMessage(this.alias, content);
 
-        // Überprüfet, ob die gefilterte Nachricht leer ist.
+        // Überprüft, ob die gefilterte Nachricht leer ist.
         if (string.IsNullOrWhiteSpace(filteredMessage))
         {
             return false; // Nachricht kann nicht gesendet werden.
@@ -106,11 +106,11 @@ public class ChatClient
     /// </summary>
     public async Task CancelListeningForMessages()
     {
-        // Sende eine Abmeldungsnachricht an den Server
+        // Sendet eine Abmeldungsnachricht an den Server.
         var message = new ChatMessage { Sender = this.alias, Content = $"left the chat" };
         await this.httpClient.PostAsJsonAsync("/messages", message);
 
-        // Signalisiere die Abbruchanforderung
+        // Signalisiert die Abbruchanforderung.
         this.cancellationTokenSource.Cancel();
     }
 
@@ -123,12 +123,13 @@ public class ChatClient
     {
         var response = await this.httpClient.GetAsync("/history");
 
+        // Wenn die Anfrage erfolgreich ist, wird die Liste mit den Nachrichten zurückgegeben.
         if (response.IsSuccessStatusCode)
         {
             return await response.Content.ReadFromJsonAsync<List<ChatMessage>>();
         }
 
-        return new List<ChatMessage>(); // Return an empty list on error
+        return new List<ChatMessage>(); // Gibt bei einem Fehler eine leere Liste zurück-
     }
 
     // Enabled the user to receive new messages. The assigned delegated is called when a new message is received.
@@ -144,10 +145,14 @@ public class ChatClient
         this.MessageReceived?.Invoke(this, new MessageReceivedEventArgs { Sender = sender, Message = message });
     }
 
+    /// <summary>
+    /// Zeigt die Chathistorie in der Konsole an.
+    /// </summary>
     public async Task ShowChatHistory()
     {
         var history = await GetChatHistory();
         Console.WriteLine("Chat History:");
+        // Durchläuft die Chat-Historie und gibt jede Nachricht mit einem Zeitstempel zurück.
         foreach (var message in history)
         {
             Console.WriteLine($"{message.Timestamp:HH:mm:ss} {message.Sender}: {message.Content}");
