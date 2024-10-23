@@ -151,12 +151,28 @@ public class ChatClient
     public async Task ShowChatHistory()
     {
         var history = await GetChatHistory();
+
+        if (history.Count == 0)
+        {
+            Console.WriteLine("Keine Nachrichten vorhanden.");
+            return;
+        }
+
+        DateTime? lastMessageDate = null; // Variable, um das Datum der letzten Nachricht zu speichern
+
         Console.WriteLine("Chat History:");
-        // Durchläuft die Chat-Historie und gibt jede Nachricht mit einem Zeitstempel zurück.
+
         foreach (var message in history)
         {
+            // Überprüft, ob die Nachricht an einem anderen Tag versendet wurde.
+            if (lastMessageDate == null || message.Timestamp.Date != lastMessageDate.Value.Date)
+            {
+                // Wenn ein neuer Tag ist, wird darüber im Chat informiert.
+                Console.WriteLine($"\n--- {message.Timestamp:dddd, dd. MMMM yyyy} ---\n");
+                lastMessageDate = message.Timestamp.Date;
+            }
+
             Console.WriteLine($"{message.Timestamp:HH:mm:ss} {message.Sender}: {message.Content}");
         }
     }
-
 }
