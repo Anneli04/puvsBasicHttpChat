@@ -1,33 +1,33 @@
 ﻿using System.Collections.Generic;
-using Microsoft.Data.Sqlite;
+using Npgsql;
 using Data;
+using Microsoft.Data.Sqlite;
 
 namespace Server
 {
     /// <summary>
-    /// Verwaltet die Interaktion mit der SQLite-Datenbank für Chatnachrichten.
+    /// Verwaltet die Interaktion mit der PostgreSQL-Datenbank für Chatnachrichten.
     /// </summary>
     public class DatabaseManager
     {
         private const string ConnectionString = "Host=192.168.0.18;Port=5432;Username=chatb;Password=bernhardt2024;Database=chat_db";
-        // Pfad zur SQLite-Datenbankdatei
 
         /// <summary>
         /// Datenbank wird initialisiert, indem, falls nicht vorhanden, die Tabelle ChatMessages erstellt wird.
         /// </summary>
         public void InitializeDatabase()
         {
-            using var connection = new SqliteConnection(ConnectionString);
+            using var connection = new NpgsqlConnection(ConnectionString);
             connection.Open();
 
             var command = connection.CreateCommand();
             command.CommandText =
             @"
                 CREATE TABLE IF NOT EXISTS ChatMessages (
-                    Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    Id SERIAL PRIMARY KEY,
                     Sender TEXT NOT NULL,
                     Content TEXT NOT NULL,
-                    Timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+                    Timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 );
             ";
             command.ExecuteNonQuery();
@@ -38,17 +38,17 @@ namespace Server
         /// </summary>
         public void SaveMessage(ChatMessage message)
         {
-            using var connection = new SqliteConnection(ConnectionString);
+            using var connection = new NpgsqlConnection(ConnectionString);
             connection.Open();
 
             var command = connection.CreateCommand();
             command.CommandText =
             @"
                 INSERT INTO ChatMessages (Sender, Content)
-                VALUES ($sender, $content);
+                VALUES (@sender, @content); // Verwende @ für Parameter
             ";
-            command.Parameters.AddWithValue("$sender", message.Sender);
-            command.Parameters.AddWithValue("$content", message.Content);
+            command.Parameters.AddWithValue("sender", message.Sender);
+            command.Parameters.AddWithValue("content", message.Content);
             command.ExecuteNonQuery();
         }
 
@@ -59,7 +59,7 @@ namespace Server
         {
             var messages = new List<ChatMessage>();
 
-            using var connection = new SqliteConnection(ConnectionString);
+            using var connection = new NpgsqlConnection(ConnectionString);
             connection.Open();
 
             var command = connection.CreateCommand();
