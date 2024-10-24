@@ -8,18 +8,23 @@ namespace Server
     /// <summary>
     /// Verwaltet die Interaktion mit der PostgreSQL-Datenbank für Chatnachrichten.
     /// </summary>
-    public class DatabaseManager
+    public class DatabaseManager : IDisposable
     {
         private const string ConnectionString = "Host=192.168.0.18;Port=5432;Username=chatb;Password=bernhardt2024;Database=chat_db";
+        private NpgsqlConnection connection;
+
+        public DatabaseManager()
+        {
+            connection = new NpgsqlConnection(ConnectionString);
+            connection.Open();
+        }
+
 
         /// <summary>
         /// Datenbank wird initialisiert, indem, falls nicht vorhanden, die Tabelle ChatMessages erstellt wird.
         /// </summary>
         public void InitializeDatabase()
         {
-            using var connection = new NpgsqlConnection(ConnectionString);
-            connection.Open();
-
             var command = connection.CreateCommand();
             command.CommandText =
             @"
@@ -27,7 +32,7 @@ namespace Server
                     Id SERIAL PRIMARY KEY,
                     Sender TEXT NOT NULL,
                     Content TEXT NOT NULL,
-                    Timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                    Timestamp TIMESTAMP
                 );
             ";
             command.ExecuteNonQuery();
@@ -38,17 +43,14 @@ namespace Server
         /// </summary>
         public void SaveMessage(ChatMessage message)
         {
-            using var connection = new NpgsqlConnection(ConnectionString);
-            connection.Open();
-
             var command = connection.CreateCommand();
             command.CommandText =
             @"
-                INSERT INTO ChatMessages (Sender, Content)
-                VALUES (@sender, @content); // Verwende @ für Parameter
+                INSERT INTO ChatMessages (Sender, Content, Timestamp) VALUES (@sender, @content, @timestamp);
             ";
             command.Parameters.AddWithValue("sender", message.Sender);
             command.Parameters.AddWithValue("content", message.Content);
+            command.Parameters.AddWithValue("timestamp", message.Timestamp);
             command.ExecuteNonQuery();
         }
 
@@ -58,9 +60,6 @@ namespace Server
         public List<ChatMessage> GetAllMessages()
         {
             var messages = new List<ChatMessage>();
-
-            using var connection = new NpgsqlConnection(ConnectionString);
-            connection.Open();
 
             var command = connection.CreateCommand();
             command.CommandText = "SELECT Sender, Content, Timestamp FROM ChatMessages ORDER BY Id;";
@@ -73,11 +72,16 @@ namespace Server
                     Sender = reader.GetString(0),
                     Content = reader.GetString(1),
                     // Konvertiert den UTC-Zeitstempel in die lokale Zeit.
-                    Timestamp = reader.GetDateTime(2).ToLocalTime()
+                    Timestamp = reader.GetDateTime(2)
                 });
             }
 
             return messages; // Gibt die Liste der Chatnachrichten zurück.
+        }
+
+        public void Dispose()
+        {
+            connection.Dispose();
         }
     }
 }
