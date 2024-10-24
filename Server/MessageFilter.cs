@@ -82,8 +82,7 @@ namespace Server
         {
             foreach (var word in words)
             {
-                string pattern = $@"(?i){Regex.Escape(word)}"; // Filtert die Wörter.
-                message = Regex.Replace(message, pattern, m => new string('*', m.Value.Length), caseInsensitive ? RegexOptions.IgnoreCase : RegexOptions.None); // Bei der Umwandlung in Sterne spielt die Groß- und Kleinschreibung keine Rolle.
+                message = message.Replace(word, new string('*', word.Length), caseInsensitive ? StringComparison.InvariantCultureIgnoreCase : StringComparison.InvariantCulture); // Bei der Umwandlung spielt die Groß- und Kleinschreibung keine Rolle.
             }
             return message; // Gibt die bearbeitete Nachricht zurück.
         }
