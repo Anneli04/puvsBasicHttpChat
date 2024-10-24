@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Http;
 
 namespace Server
 {
-    public class ChatServer
+    public class ChatServer : IDisposable
     {
         private readonly ConcurrentQueue<ChatMessage> messageQueue = new();
         private readonly ConcurrentDictionary<string, TaskCompletionSource<ChatMessage>> waitingClients = new();
@@ -107,6 +107,11 @@ namespace Server
                     await context.Response.WriteAsJsonAsync(chatHistory);
                 });
             });
+        }
+
+        public void Dispose()
+        {
+            databaseManager.Dispose();
         }
     }
 }
