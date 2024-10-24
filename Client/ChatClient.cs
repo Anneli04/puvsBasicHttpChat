@@ -158,7 +158,7 @@ public class ChatClient
             return;
         }
 
-        DateTime lastMessageDate = DateTime.MinValue; // Variable, um das Datum der letzten Nachricht zu speichern
+        DateTime lastMessageDate = DateTime.MinValue; // Variable, um das Datum der letzten Nachricht zu speichern.
 
         Console.WriteLine("Chat History:");
 

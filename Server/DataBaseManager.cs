@@ -10,6 +10,7 @@ namespace Server
     /// </summary>
     public class DatabaseManager : IDisposable
     {
+        // Verbindet mit der Datenbank auf PostgreSQL, damit die Nachrichten anderer Benutzer jeweils einsehbar sind.
         private const string ConnectionString = "Host=192.168.0.18;Port=5432;Username=chatb;Password=bernhardt2024;Database=chat_db";
         private NpgsqlConnection connection;
 
@@ -48,6 +49,7 @@ namespace Server
             @"
                 INSERT INTO ChatMessages (Sender, Content, Timestamp) VALUES (@sender, @content, @timestamp);
             ";
+
             command.Parameters.AddWithValue("sender", message.Sender);
             command.Parameters.AddWithValue("content", message.Content);
             command.Parameters.AddWithValue("timestamp", message.Timestamp);
@@ -71,7 +73,6 @@ namespace Server
                 {
                     Sender = reader.GetString(0),
                     Content = reader.GetString(1),
-                    // Konvertiert den UTC-Zeitstempel in die lokale Zeit.
                     Timestamp = reader.GetDateTime(2)
                 });
             }
