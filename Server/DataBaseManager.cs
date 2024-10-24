@@ -9,7 +9,8 @@ namespace Server
     /// </summary>
     public class DatabaseManager
     {
-        private const string ConnectionString = "Data Source=chat.db"; // Pfad zur SQLite-Datenbankdatei
+        private const string ConnectionString = "Host=192.168.0.18;Port=5432;Username=chatb;Password=bernhardt2024;Database=chat_db";
+        // Pfad zur SQLite-Datenbankdatei
 
         /// <summary>
         /// Datenbank wird initialisiert, indem, falls nicht vorhanden, die Tabelle ChatMessages erstellt wird.
