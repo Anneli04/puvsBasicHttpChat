@@ -67,16 +67,12 @@ namespace Server
             using var reader = command.ExecuteReader();
             while (reader.Read())
             {
-                var timestamp = reader.GetDateTime(2);
-
-                // Konvertiert den UTC-Zeitstempel in die lokale Zeit.
-                var localTimestamp = timestamp.ToLocalTime();
-
                 messages.Add(new ChatMessage
                 {
                     Sender = reader.GetString(0),
                     Content = reader.GetString(1),
-                    Timestamp = localTimestamp
+                    // Konvertiert den UTC-Zeitstempel in die lokale Zeit.
+                    Timestamp = reader.GetDateTime(2).ToLocalTime()
                 });
             }
 

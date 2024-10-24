@@ -158,14 +158,14 @@ public class ChatClient
             return;
         }
 
-        DateTime? lastMessageDate = null; // Variable, um das Datum der letzten Nachricht zu speichern
+        DateTime lastMessageDate = DateTime.MinValue; // Variable, um das Datum der letzten Nachricht zu speichern
 
         Console.WriteLine("Chat History:");
 
         foreach (var message in history)
         {
             // Überprüft, ob die Nachricht an einem anderen Tag versendet wurde.
-            if (lastMessageDate == null || message.Timestamp.Date != lastMessageDate.Value.Date)
+            if (message.Timestamp.Date != lastMessageDate.Date)
             {
                 // Wenn ein neuer Tag ist, wird darüber im Chat informiert.
                 Console.WriteLine($"\n--- {message.Timestamp:dddd, dd. MMMM yyyy} ---\n");

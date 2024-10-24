@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
@@ -17,7 +18,7 @@ namespace Server
         private static HashSet<string> _unangebrachteWoerter;
 
         // Dictionary zur Beobachtung der Zeitstempel der gesendeten Nachrichten für jeden Benutzer.
-        private static Dictionary<string, List<DateTime>> _userMessageTimestamps = new();
+        private static ConcurrentDictionary<string, List<DateTime>> _userMessageTimestamps = new();
         private const int SpamThreshold = 5; // Anzahl der Nachrichten, die als Spam gelten
         private const int SpamTimeFrameInSeconds = 10; // Zeitrahmen für die Spam-Erkennung
 
@@ -93,18 +94,13 @@ namespace Server
         private static bool IsSpam(string sender)
         {
             var now = DateTime.Now;
-
-            // Überprüft, ob der Benutzer im Dictionary eingetragen ist.
-            if (!_userMessageTimestamps.ContainsKey(sender))
-            {
-                _userMessageTimestamps[sender] = new List<DateTime>(); // Erstellt eine neue Liste für den Benutzer
-            }
+            var userList = _userMessageTimestamps.GetOrAdd(sender, k => new List<DateTime>());
 
             // Entfernt Zeitstempel, die älter als die festgelegten Zeitgrenzen sind.
-            _userMessageTimestamps[sender].RemoveAll(ts => (now - ts).TotalSeconds > SpamTimeFrameInSeconds);
+            userList.RemoveAll(ts => (now - ts).TotalSeconds > SpamTimeFrameInSeconds);
 
             // Überprüft, ob die Anzahl der Nachrichten die Grenze überschreitet.
-            return _userMessageTimestamps[sender].Count > SpamThreshold;
+            return userList.Count > SpamThreshold;
         }
 
         /// <summary>
@@ -112,16 +108,7 @@ namespace Server
         /// </summary>
         private static void TrackMessage(string sender)
         {
-            var now = DateTime.Now;
-
-            // Überprüft, ob der Benutzer im Dictionary eingetragen ist
-            if (!_userMessageTimestamps.ContainsKey(sender))
-            {
-                _userMessageTimestamps[sender] = new List<DateTime>(); // Erstellt eine neue Liste für den Benutzer
-            }
-
-            // Fügt einen Zeitstempel mit der aktuellen Uhrzeit hinzu.
-            _userMessageTimestamps[sender].Add(now);
+            _userMessageTimestamps.GetOrAdd(sender, k => new List<DateTime>()).Add(DateTime.Now);
         }
 
         /// <summary>
